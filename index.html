@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SANARÉ — Historia Clínica + Nota de Evolución (Plantilla)</title>
+  <meta name="description" content="SANARÉ: Plantilla de Historia Clínica y Nota de Evolución con campos desplegables y selección múltiple (síntomas por sistemas). Fondo claro y branding SANARÉ." />
+  <style>
+    :root{
+      --bg:#f7f7f6;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --accent:#b08a83;
+      --accent2:#7a5b55;
+      --shadow:0 10px 30px rgba(0,0,0,.06);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      color:var(--text);
+      background: radial-gradient(1200px 600px at 15% 0%, rgba(176,138,131,.18), transparent 60%),
+                  radial-gradient(900px 500px at 90% 10%, rgba(122,91,85,.12), transparent 55%),
+                  var(--bg);
+    }
+    a{color:inherit}
+    .wrap{max-width:860px;width:100%;margin:0 auto;padding:16px 12px 44px}
+    header{
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      padding:14px 16px;background:rgba(255,255,255,.7);
+      border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);
+      backdrop-filter: blur(8px);
+      position:sticky; top:12px; z-index:10;
+    }
+    .brand{display:flex;align-items:center;gap:14px;min-width:220px}
+    .brand img{width:54px;height:54px;object-fit:contain;border-radius:14px;background:#fff;border:1px solid var(--line);padding:8px}
+    .brand .name{display:flex;flex-direction:column;line-height:1.1}
+    .brand .name b{font-size:18px;letter-spacing:.4px}
+    .brand .name span{font-size:12px;color:var(--muted)}
+    nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    nav a{
+      text-decoration:none; font-size:13px; color:var(--accent2);
+      padding:8px 10px; border-radius:12px; border:1px solid transparent;
+    }
+    nav a:hover{border-color:var(--line); background:#fff}
+    section{scroll-margin-top:110px}
+    .hero{
+      margin-top:18px; padding:26px; border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.72));
+      border:1px solid var(--line); box-shadow:var(--shadow);
+      display:grid; grid-template-columns: 1fr; gap:18px;
+    }
+    .hero h1{margin:0 0 8px;font-size:30px;letter-spacing:.2px}
+    .hero p{margin:0;color:var(--muted);line-height:1.55}
+    .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:11px 14px; border-radius:14px; text-decoration:none;
+      border:1px solid var(--line); background:#fff;
+      font-weight:600; font-size:14px;
+    }
+    .btn.primary{
+      background: linear-gradient(180deg, rgba(176,138,131,.95), rgba(122,91,85,.92));
+      color:#fff; border-color:transparent;
+    }
+    .btn.primary:hover{filter:brightness(1.03)}
+    .mini{
+      background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+      padding:14px; box-shadow:var(--shadow);
+    }
+    .mini h3{margin:0 0 8px;font-size:14px}
+    .pill{
+      display:inline-flex; align-items:center;
+      padding:6px 10px;border-radius:999px;border:1px solid var(--line);
+      background:#fff; font-size:12px; color:var(--accent2); margin:4px 6px 0 0;
+    }
+    .card{
+      background:rgba(255,255,255,.86);
+      border:1px solid var(--line); border-radius:var(--radius);
+      padding:16px; box-shadow:var(--shadow);
+    }
+    .grid{margin-top:14px; display:grid; gap:14px; grid-template-columns: 1fr 1fr;}
+    @media (max-width: 900px){ .hero{grid-template-columns:1fr} .grid{grid-template-columns:1fr} header{position:static} }
+    h2{margin:0 0 10px;font-size:18px}
+    h3{margin:14px 0 8px;font-size:14px;color:var(--accent2)}
+    p{margin:0;color:var(--muted);line-height:1.6;font-size:14px}
+    .note{font-size:12px;color:var(--muted); background:#fff;border:1px dashed var(--line); padding:10px 12px;border-radius:14px;margin-top:12px;}
+    .toc{display:grid; gap:10px; grid-template-columns: 1fr 1fr; margin-top:14px;}
+    .toc a{text-decoration:none;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:#fff;font-size:13px;color:var(--accent2);}
+    .toc a:hover{background:rgba(176,138,131,.08)}
+    .row{display:grid;grid-template-columns: 1fr 1fr; gap:12px}
+    .row3{display:grid;grid-template-columns: 1fr 1fr 1fr; gap:12px}
+    .field{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+    label{font-size:12px;color:var(--accent2);font-weight:700;letter-spacing:.2px}
+    input, select, textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:14px;
+      background:#fff;
+      outline:none;
+    }
+    textarea{min-height:90px;resize:vertical}
+    input:focus, select:focus, textarea:focus{border-color:rgba(176,138,131,.65); box-shadow:0 0 0 4px rgba(176,138,131,.12)}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .chip{
+      border:1px solid var(--line); background:#fff; border-radius:999px; padding:7px 10px;
+      font-size:13px; color:var(--text);
+      display:flex; align-items:center; gap:8px;
+    }
+    .chip input{width:16px;height:16px}
+    .muted{color:var(--muted); font-size:12px; margin-top:6px}
+    .divider{height:1px;background:var(--line);margin:16px 0}
+    footer{margin-top:20px;color:var(--muted);font-size:12px;text-align:center}
+  
+    /* Botones PDF/Imprimir en header */
+    nav.single{display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-wrap:wrap}
+    nav.single .btn{
+      border:1px solid var(--line);
+      background:#fff;
+      padding:10px 14px;
+      border-radius:14px;
+      font-weight:700;
+      color:var(--accent2);
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    nav.single .btn:hover{background:rgba(176,138,131,.08)}
+    nav.single::before, nav.single::after{content:none !important; display:none !important;}
+
+  
+    @media print{
+      header, footer{display:none !important;}
+      body{background:#fff !important;}
+      .wrap{padding:0 !important; max-width:none !important;}
+      .card{box-shadow:none !important;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <img src="assets/logo-sanare.png" alt="SANARÉ" />
+        <div class="name">
+          <b>SANARÉ</b>
+          <span>Centro oncológico y alta especialidad</span>
+        </div>
+      </div>
+      
+      <nav class="single">
+        <a class="btn pdf" href="#" onclick="window.print();return false;">⬇️ Descargar PDF</a>
+        <a class="btn print" href="#" onclick="window.print();return false;">🖨️ Imprimir</a>
+      </nav>
+
+    </header>
+
+    <main>
+<section class="card" id="indice" style="margin-top:18px">
+        <h2>Índice</h2>
+        <p>Estructura integrada con base en Historia Clínica + correcciones de Nota de Evolución.</p>
+        <div class="toc" aria-label="Tabla de contenido">
+          <a href="#formato">1) Ficha de identificación</a>
+          <a href="#heredo">2) Antecedentes heredofamiliares</a>
+          <a href="#no-pato">3) No patológicos</a>
+          <a href="#pato">4) Patológicos</a>
+          <a href="#gine">5) Gineco-obstétricos</a>
+          <a href="#actual">6) Padecimiento actual</a>
+          <a href="#sistemas">7) Interrogatorio por sistemas</a>
+          <a href="#sv">8) Signos vitales</a>
+          <a href="#explora">9) Exploración / impresión</a>
+          <a href="#checklist">Checklist</a>
+        </div>
+      </section>
+
+      <section class="card" id="formato" style="margin-top:14px">
+        <h2>1) Ficha de identificación</h2>
+        <div class="row">
+          <div class="field"><label>Nombre del paciente</label><input placeholder="Nombre completo" /></div>
+          <div class="field"><label>Número de expediente</label><input placeholder="Ej. SAN-000123" /></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label>Edad</label><input type="number" min="0" placeholder="Años" /></div>
+          <div class="field"><label>Género</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>Femenino</option>
+              <option>Masculino</option>
+            </select>
+          </div>
+          <div class="field"><label>Fecha de nacimiento</label><input type="date" /></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Ocupación</label><input placeholder="Ocupación actual" /></div>
+          <div class="field"><label>Grupo étnico</label><input placeholder="Ej. Mestiza" /></div>
+        </div>
+        <div class="field"><label>Domicilio</label><input placeholder="Calle, número, colonia, ciudad, estado, CP" /></div>
+        <div class="row">
+          <div class="field"><label>Teléfono</label><input placeholder="Ej. 55 0000 0000" /></div>
+          <div class="field"><label>Alergias</label><input placeholder="Ninguna / especificar" /></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Hemotipo</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>A+</option><option>A-</option>
+              <option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option>
+              <option>O+</option><option>O-</option>
+              <option>Desconoce</option>
+            </select>
+          </div>
+          <div class="field"><label>Inmunizaciones</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>Completas</option>
+              <option>Incompletas</option>
+              <option>Desconoce</option>
+            </select>
+          </div>
+        </div>
+
+        <h3>Familiar responsable</h3>
+        <div class="row">
+          <div class="field"><label>Nombre</label><input placeholder="Nombre completo" /></div>
+          <div class="field"><label>Parentesco</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>Mamá</option><option>Papá</option>
+              <option>Abuela materna</option><option>Abuelo materno</option>
+              <option>Abuela paterna</option><option>Abuelo paterno</option>
+              <option>Hermano(a)</option><option>Tío(a)</option>
+              <option>Pareja</option><option>Hijo(a)</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Teléfono del familiar responsable</label><input placeholder="Ej. 55 0000 0000" /></div>
+        <div class="muted">Campos agregados desde “Correcciones Nota de Evolución”.</div>
+      </section>
+
+      <section class="card" id="heredo" style="margin-top:14px">
+        <h2>2) Antecedentes heredofamiliares</h2>
+        <p>Marca Sí/No por rubro y, si es “Sí”, registra parentesco y diagnóstico.</p>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <div class="field"><label>Crónico-degenerativas</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option></select>
+          </div>
+          <div class="field"><label>Parentesco</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>Mamá</option><option>Papá</option>
+              <option>Abuela materna</option><option>Abuelo materno</option>
+              <option>Abuela paterna</option><option>Abuelo paterno</option>
+              <option>Hermanos</option><option>Tíos</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Diagnóstico</label><input placeholder="Ej. DM2, HAS, etc." /></div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <div class="field"><label>Autoinmunes</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option></select>
+          </div>
+          <div class="field"><label>Parentesco</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>Mamá</option><option>Papá</option>
+              <option>Abuela materna</option><option>Abuelo materno</option>
+              <option>Abuela paterna</option><option>Abuelo paterno</option>
+              <option>Hermanos</option><option>Tíos</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Diagnóstico</label><input placeholder="Ej. LES, AR, etc." /></div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <div class="field"><label>Infecciosas</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option></select>
+          </div>
+          <div class="field"><label>Parentesco</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>Mamá</option><option>Papá</option>
+              <option>Abuela materna</option><option>Abuelo materno</option>
+              <option>Abuela paterna</option><option>Abuelo paterno</option>
+              <option>Hermanos</option><option>Tíos</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Diagnóstico</label><input placeholder="Ej. TB, hepatitis, etc." /></div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <div class="field"><label>Oncológicas</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option></select>
+          </div>
+          <div class="field"><label>Parentesco</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>Mamá</option><option>Papá</option>
+              <option>Abuela materna</option><option>Abuelo materno</option>
+              <option>Abuela paterna</option><option>Abuelo paterno</option>
+              <option>Hermanos</option><option>Tíos</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Diagnóstico</label><input placeholder="Ej. Mama, colon…" /></div>
+          <div class="field"><label>Edad al diagnóstico (aprox.)</label><input type="number" min="0" placeholder="Años" /></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <div class="field"><label>Otros</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option></select>
+          </div>
+          <div class="field"><label>Parentesco</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>Mamá</option><option>Papá</option>
+              <option>Abuela materna</option><option>Abuelo materno</option>
+              <option>Abuela paterna</option><option>Abuelo paterno</option>
+              <option>Hermanos</option><option>Tíos</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Diagnóstico / comentario</label><input placeholder="Especificar" /></div>
+      </section>
+
+      <section class="card" id="no-pato" style="margin-top:14px">
+        <h2>3) Antecedentes personales no patológicos</h2>
+
+        <div class="row">
+          <div class="field"><label>Originaria</label><input placeholder="Ciudad/Estado" /></div>
+          <div class="field"><label>Residente</label><input placeholder="Ciudad/Estado" /></div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>Nivel de estudios</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>No sabe leer ni escribir</option>
+              <option>Sabe leer y escribir</option>
+              <option>Primaria completa</option>
+              <option>Primaria incompleta</option>
+              <option>Secundaria completa</option>
+              <option>Secundaria incompleta</option>
+              <option>Preparatoria completa</option>
+              <option>Preparatoria incompleta</option>
+              <option>Universidad completa</option>
+              <option>Universidad incompleta</option>
+            </select>
+          </div>
+          <div class="field"><label>Estado civil</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>Soltero(a)</option>
+              <option>Casado(a)</option>
+              <option>Divorciado(a)</option>
+              <option>Viudo(a)</option>
+              <option>Unión libre</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>Religión</label><input placeholder="Ej. Católica" /></div>
+          <div class="field"><label>Habita en casa</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>Propia</option>
+              <option>Rentada</option>
+              <option>Prestada</option>
+              <option>Otra</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>Hacinamiento</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option></select>
+          </div>
+          <div class="field"><label>¿Con cuántas personas vive?</label><input type="number" min="0" placeholder="Número" /></div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>Servicios básicos de saneamiento</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option></select>
+          </div>
+          <div class="field"><label>Zoonosis</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option></select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>Tatuajes</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option></select>
+          </div>
+          <div class="field"><label>Lugar / tiempo</label><input placeholder="Ej. brazo derecho, hace 2 años" /></div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>Piercings</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option></select>
+          </div>
+          <div class="field"><label>Lugar / tiempo</label><input placeholder="Ej. oreja, hace 6 meses" /></div>
+        </div>
+      </section>
+
+      <section class="card" id="pato" style="margin-top:14px">
+        <h2>4) Antecedentes personales patológicos</h2>
+
+        <div class="row">
+          <div class="field"><label>Crónico-degenerativos</label><textarea placeholder="Diagnóstico(s), año, tratamiento"></textarea></div>
+          <div class="field"><label>Cirugías</label><textarea placeholder="Procedimiento(s), año, motivo"></textarea></div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>Traumatismos</label><textarea placeholder="Describir"></textarea></div>
+          <div class="field"><label>Transfusiones</label><textarea placeholder="Tipo, motivo, fecha, reacciones"></textarea></div>
+        </div>
+
+        <div class="field"><label>Hospitalizaciones en los últimos 6 meses</label>
+          <select><option value="">Selecciona…</option><option>Sí</option><option>No</option></select>
+        </div>
+
+        <div class="divider"></div>
+        <p><b>Hábitos</b> (integrado): Sí / No / Suspendido + tiempo de consumo.</p>
+
+        <div class="row">
+          <div class="field"><label>Tabaquismo</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option><option>Suspendido</option></select>
+          </div>
+          <div class="field"><label>¿Durante cuánto tiempo?</label><input placeholder="Ej. 3 años / 10 años" /></div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>Alcoholismo</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option><option>Suspendido</option></select>
+          </div>
+          <div class="field"><label>¿Durante cuánto tiempo?</label><input placeholder="Ej. 5 años" /></div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>Toxicomanías</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option><option>Suspendido</option></select>
+          </div>
+          <div class="field"><label>¿Durante cuánto tiempo?</label><input placeholder="Ej. 1 año" /></div>
+        </div>
+      </section>
+
+      <section class="card" id="gine" style="margin-top:14px">
+        <h2>5) Antecedentes gineco-obstétricos</h2>
+
+        <div class="row3">
+          <div class="field"><label>Menarca</label><input placeholder="Edad" /></div>
+          <div class="field"><label>Menopausia</label>
+            <select><option value="">Selecciona…</option><option>Sí</option><option>No</option></select>
+          </div>
+          <div class="field"><label>¿Cuándo?</label><input placeholder="Ej. 2022 / hace 3 años" /></div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>Ritmo</label>
+            <select><option value="">Selecciona…</option><option>Regular</option><option>Irregular</option></select>
+          </div>
+          <div class="field"><label>Tipo</label>
+            <select><option value="">Selecciona…</option><option>Dismenorreica</option><option>Eumenorreica</option></select>
+          </div>
+        </div>
+
+        <div class="row3">
+          <div class="field"><label>IVSA</label><input placeholder="Edad / fecha" /></div>
+          <div class="field"><label>NPS</label><input placeholder="Número de parejas sexuales" /></div>
+          <div class="field"><label>PAP</label><input placeholder="Fecha / resultado" /></div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>ETS</label><input placeholder="Negada / especificar" /></div>
+          <div class="field"><label>MPF</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>DIU</option>
+              <option>Inyección hormonal</option>
+              <option>Parche</option>
+              <option>Implante subdérmico</option>
+              <option>Pastillas hormonales</option>
+              <option>Condón</option>
+              <option>OTB</option>
+              <option>Ninguno</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row3">
+          <div class="field"><label>G</label><input type="number" min="0" /></div>
+          <div class="field"><label>P</label><input type="number" min="0" /></div>
+          <div class="field"><label>C / A</label><input placeholder="Ej. C=0, A=0" /></div>
+        </div>
+      </section>
+
+      <section class="card" id="actual" style="margin-top:14px">
+        <h2>6) Padecimiento actual</h2>
+        <p>De acuerdo a la corrección: aquí va la narrativa clínica <b>antes</b> de signos vitales.</p>
+        <div class="field"><label>Motivo de consulta / evolución</label><textarea placeholder="Escribe aquí el padecimiento actual..."></textarea></div>
+      </section>
+
+      <section class="card" id="sistemas" style="margin-top:14px">
+        <h2>7) Interrogatorio por aparatos y sistemas (selección múltiple)</h2>
+        <p>Selecciona todos los síntomas que apliquen.</p>
+
+        <h3>Cardiovascular</h3>
+        <div class="chips">
+          <label class="chip"><input type="checkbox"> Cianosis</label>
+          <label class="chip"><input type="checkbox"> Palpitaciones</label>
+          <label class="chip"><input type="checkbox"> Dolor precordial</label>
+          <label class="chip"><input type="checkbox"> Apnea</label>
+          <label class="chip"><input type="checkbox"> Edema</label>
+          <label class="chip"><input type="checkbox"> Lipotimias</label>
+          <label class="chip"><input type="checkbox"> Síncope</label>
+        </div>
+
+        <h3>Respiratorio</h3>
+        <div class="chips">
+          <label class="chip"><input type="checkbox"> Disnea</label>
+          <label class="chip"><input type="checkbox"> Tos</label>
+          <label class="chip"><input type="checkbox"> Rinorrea</label>
+          <label class="chip"><input type="checkbox"> Rinorragia</label>
+          <label class="chip"><input type="checkbox"> Expectoraciones</label>
+          <label class="chip"><input type="checkbox"> Hemoptisis</label>
+          <label class="chip"><input type="checkbox"> Epistaxis</label>
+          <label class="chip"><input type="checkbox"> Dolor torácico</label>
+        </div>
+
+        <h3>Gastrointestinal</h3>
+        <div class="chips">
+          <label class="chip"><input type="checkbox"> Diarrea</label>
+          <label class="chip"><input type="checkbox"> Estreñimiento</label>
+          <label class="chip"><input type="checkbox"> Náusea</label>
+          <label class="chip"><input type="checkbox"> Vómito</label>
+          <label class="chip"><input type="checkbox"> Pirosis</label>
+          <label class="chip"><input type="checkbox"> Reflujo</label>
+          <label class="chip"><input type="checkbox"> Hematemesis</label>
+          <label class="chip"><input type="checkbox"> Hematoquecia</label>
+          <label class="chip"><input type="checkbox"> Melena</label>
+          <label class="chip"><input type="checkbox"> Pujo</label>
+          <label class="chip"><input type="checkbox"> Tenesmo</label>
+          <label class="chip"><input type="checkbox"> Odinofagia</label>
+          <label class="chip"><input type="checkbox"> Halitosis</label>
+          <label class="chip"><input type="checkbox"> Disfagia</label>
+          <label class="chip"><input type="checkbox"> Anorexia</label>
+          <label class="chip"><input type="checkbox"> Rectorragia</label>
+          <label class="chip"><input type="checkbox"> Meteorismo</label>
+          <label class="chip"><input type="checkbox"> Acolia</label>
+        </div>
+
+        <h3>Genitourinario</h3>
+        <div class="chips">
+          <label class="chip"><input type="checkbox"> Disuria</label>
+          <label class="chip"><input type="checkbox"> Hematuria</label>
+          <label class="chip"><input type="checkbox"> Poliuria</label>
+          <label class="chip"><input type="checkbox"> Oliguria</label>
+          <label class="chip"><input type="checkbox"> Anuria</label>
+          <label class="chip"><input type="checkbox"> Poliaquiuria</label>
+          <label class="chip"><input type="checkbox"> Urgencia urinaria</label>
+          <label class="chip"><input type="checkbox"> Dispareunia</label>
+          <label class="chip"><input type="checkbox"> Piuria</label>
+          <label class="chip"><input type="checkbox"> Coluria</label>
+        </div>
+
+        <h3>Hemático / Linfático</h3>
+        <div class="chips">
+          <label class="chip"><input type="checkbox"> Equimosis</label>
+          <label class="chip"><input type="checkbox"> Petequias</label>
+          <label class="chip"><input type="checkbox"> Trombosis</label>
+          <label class="chip"><input type="checkbox"> Adenopatías</label>
+        </div>
+
+        <h3>Endocrino</h3>
+        <div class="chips">
+          <label class="chip"><input type="checkbox"> Hirsutismo</label>
+          <label class="chip"><input type="checkbox"> Polidipsia</label>
+          <label class="chip"><input type="checkbox"> Polifagia</label>
+          <label class="chip"><input type="checkbox"> Intolerancia al calor</label>
+          <label class="chip"><input type="checkbox"> Intolerancia al frío</label>
+        </div>
+
+        <h3>Nervioso</h3>
+        <div class="chips">
+          <label class="chip"><input type="checkbox"> Cefalea</label>
+          <label class="chip"><input type="checkbox"> Acúfenos</label>
+          <label class="chip"><input type="checkbox"> Fosfenos</label>
+          <label class="chip"><input type="checkbox"> Convulsiones</label>
+          <label class="chip"><input type="checkbox"> Parestesias</label>
+        </div>
+
+        <h3>Musculoesquelético</h3>
+        <div class="chips">
+          <label class="chip"><input type="checkbox"> Mialgias</label>
+          <label class="chip"><input type="checkbox"> Artralgias</label>
+          <label class="chip"><input type="checkbox"> Limitación del movimiento</label>
+        </div>
+
+        <h3>Mucosas y anexos</h3>
+        <div class="chips">
+          <label class="chip"><input type="checkbox"> Lesiones dermatológicas</label>
+          <label class="chip"><input type="checkbox"> Equimosis</label>
+          <label class="chip"><input type="checkbox"> Ictericia</label>
+        </div>
+
+        <div class="field">
+          <label>Notas / otros síntomas</label>
+          <textarea placeholder="Agrega observaciones relevantes..."></textarea>
+        </div>
+      </section>
+
+      <section class="card" id="sv" style="margin-top:14px">
+        <h2>8) Signos vitales</h2>
+        <div class="row3">
+          <div class="field"><label>TA</label><input placeholder="Ej. 120/80" /></div>
+          <div class="field"><label>FC</label><input placeholder="lpm" /></div>
+          <div class="field"><label>FR</label><input placeholder="rpm" /></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label>SatO2</label><input placeholder="%" /></div>
+          <div class="field"><label>Temp</label><input placeholder="°C" /></div>
+          <div class="field"><label>ECOG</label>
+            <select>
+              <option value="">Selecciona…</option>
+              <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Hora de toma</label><input type="time" /></div>
+      </section>
+
+      <section class="card" id="explora" style="margin-top:14px">
+        <h2>9) Exploración física / Diagnóstico</h2>
+
+        <div class="field"><label>Exploración física</label><textarea placeholder="Hallazgos relevantes..."></textarea></div>
+        <div class="field"><label>Diagnóstico histopatológico</label><textarea placeholder="Describe diagnóstico..."></textarea></div>
+        <div class="field"><label>Estudios de laboratorio y gabinete</label><textarea placeholder="BH, QS, PFH, imagen, etc..."></textarea></div>
+        <div class="field"><label>Tratamientos oncológicos previos</label><textarea placeholder="Esquemas, fechas, ciclos..."></textarea></div>
+        <div class="field"><label>Impresión diagnóstica</label><textarea placeholder="Impresión diagnóstica..."></textarea></div>
+        <div class="field"><label>Elaboró</label><input placeholder="Nombre y cédula" /></div>
+      </section>
+
+      <section class="card" id="checklist" style="margin-top:14px">
+        <h2>Checklist rápido de calidad</h2>
+        <ul>
+          <li>Si se marca “Sí” en heredofamiliares: capturar <b>parentezco + diagnóstico</b> y (si aplica) edad.</li>
+          <li>En hábitos: usar <b>Sí/No/Suspendido</b> y siempre registrar <b>tiempo</b> si aplica.</li>
+          <li>En GO: incluir IVSA, PAP, ETS y MPF cuando aplique (evitar “NA” ambiguo).</li>
+          <li>En SV: registrar <b>hora</b> y ECOG cuando corresponda.</li>
+          <li>En interrogatorio: seleccionar múltiples síntomas y complementar con notas.</li>
+        </ul>
+        <div class="muted">Basado en la lista de correcciones solicitadas.</div>
+      </section>
+
+      <footer>
+        © SANARÉ — Plantillas clínicas (GitHub Pages). Fondo claro · Paleta SANARÉ.
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
