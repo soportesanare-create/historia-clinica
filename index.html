@@ -93,6 +93,7 @@
     .toc a:hover{background:rgba(176,138,131,.08)}
     .row{display:grid;grid-template-columns: 1fr 1fr; gap:12px}
     .row3{display:grid;grid-template-columns: 1fr 1fr 1fr; gap:12px}
+    .full{grid-column: 1 / -1;}
     .field{display:flex;flex-direction:column;gap:6px;margin-top:10px}
     label{font-size:12px;color:var(--accent2);font-weight:700;letter-spacing:.2px}
     input, select, textarea{
@@ -152,7 +153,22 @@
       .row-gpc{grid-template-columns: 70px 70px 1fr;}
     }
 
-  </style>
+  
+
+    /* FUM: calendario + campo grande para escribir */
+    .fum-wrap{display:flex; gap:10px; align-items:center}
+    .fum-wrap input[type="date"]{
+      max-width:180px;
+      padding:12px 12px;
+      height:46px;
+    }
+    #fumText{
+      flex:1;
+      padding:12px 12px;
+      height:46px;
+      font-size:15px;
+    }
+</style>
 </head>
 
 <body>
@@ -504,6 +520,15 @@
         </div>
 
         <div class="row">
+          <div class="field full"><label>FUM</label>
+            <div class="fum-wrap">
+              <input id="fum" type="date" />
+              <input id="fumText" placeholder="comentario FUM" inputmode="numeric" autocomplete="off" />
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
           <div class="field"><label>Ritmo</label>
             <select><option value="">Selecciona…</option><option>Regular</option><option>Irregular</option></select>
           </div>
@@ -566,8 +591,7 @@
       <section class="card" id="sistemas" style="margin-top:14px">
         <h2>7) Interrogatorio por aparatos y sistemas (selección múltiple)</h2>
         <p>Selecciona todos los síntomas que apliquen.</p>
-
-        <h3>Cardiovascular</h3>
+<h3>Cardiovascular</h3>
         <div class="chips">
           <label class="chip"><input type="checkbox"> Cianosis</label>
           <label class="chip"><input type="checkbox"> Palpitaciones</label>
@@ -576,6 +600,8 @@
           <label class="chip"><input type="checkbox"> Edema</label>
           <label class="chip"><input type="checkbox"> Lipotimias</label>
           <label class="chip"><input type="checkbox"> Síncope</label>
+        
+          <label class="chip chip-negados"><input type="checkbox" class="negados-toggle" data-scope="cardiovascular"> Interrogados y negados</label>
         </div>
 
         <h3>Respiratorio</h3>
@@ -588,6 +614,8 @@
           <label class="chip"><input type="checkbox"> Hemoptisis</label>
           <label class="chip"><input type="checkbox"> Epistaxis</label>
           <label class="chip"><input type="checkbox"> Dolor torácico</label>
+        
+          <label class="chip chip-negados"><input type="checkbox" class="negados-toggle" data-scope="respiratorio"> Interrogados y negados</label>
         </div>
 
         <h3>Gastrointestinal</h3>
@@ -610,6 +638,8 @@
           <label class="chip"><input type="checkbox"> Rectorragia</label>
           <label class="chip"><input type="checkbox"> Meteorismo</label>
           <label class="chip"><input type="checkbox"> Acolia</label>
+        
+          <label class="chip chip-negados"><input type="checkbox" class="negados-toggle" data-scope="gastrointestinal"> Interrogados y negados</label>
         </div>
 
         <h3>Genitourinario</h3>
@@ -624,6 +654,8 @@
           <label class="chip"><input type="checkbox"> Dispareunia</label>
           <label class="chip"><input type="checkbox"> Piuria</label>
           <label class="chip"><input type="checkbox"> Coluria</label>
+        
+          <label class="chip chip-negados"><input type="checkbox" class="negados-toggle" data-scope="genitourinario"> Interrogados y negados</label>
         </div>
 
         <h3>Hemático / Linfático</h3>
@@ -632,6 +664,8 @@
           <label class="chip"><input type="checkbox"> Petequias</label>
           <label class="chip"><input type="checkbox"> Trombosis</label>
           <label class="chip"><input type="checkbox"> Adenopatías</label>
+        
+          <label class="chip chip-negados"><input type="checkbox" class="negados-toggle" data-scope="hem-tico-linf-tico"> Interrogados y negados</label>
         </div>
 
         <h3>Endocrino</h3>
@@ -641,6 +675,8 @@
           <label class="chip"><input type="checkbox"> Polifagia</label>
           <label class="chip"><input type="checkbox"> Intolerancia al calor</label>
           <label class="chip"><input type="checkbox"> Intolerancia al frío</label>
+        
+          <label class="chip chip-negados"><input type="checkbox" class="negados-toggle" data-scope="endocrino"> Interrogados y negados</label>
         </div>
 
         <h3>Nervioso</h3>
@@ -650,6 +686,8 @@
           <label class="chip"><input type="checkbox"> Fosfenos</label>
           <label class="chip"><input type="checkbox"> Convulsiones</label>
           <label class="chip"><input type="checkbox"> Parestesias</label>
+        
+          <label class="chip chip-negados"><input type="checkbox" class="negados-toggle" data-scope="nervioso"> Interrogados y negados</label>
         </div>
 
         <h3>Musculoesquelético</h3>
@@ -657,6 +695,8 @@
           <label class="chip"><input type="checkbox"> Mialgias</label>
           <label class="chip"><input type="checkbox"> Artralgias</label>
           <label class="chip"><input type="checkbox"> Limitación del movimiento</label>
+        
+          <label class="chip chip-negados"><input type="checkbox" class="negados-toggle" data-scope="musculoesquel-tico"> Interrogados y negados</label>
         </div>
 
         <h3>Mucosas y anexos</h3>
@@ -664,6 +704,8 @@
           <label class="chip"><input type="checkbox"> Lesiones dermatológicas</label>
           <label class="chip"><input type="checkbox"> Equimosis</label>
           <label class="chip"><input type="checkbox"> Ictericia</label>
+        
+          <label class="chip chip-negados"><input type="checkbox" class="negados-toggle" data-scope="mucosas-y-anexos"> Interrogados y negados</label>
         </div>
 
         <div class="field">
@@ -763,7 +805,81 @@
     }
   })();
 
-  // Exportación sencilla a Word (HTML compatible)
+  
+  // Interrogatorio por sistemas: "Interrogados y negados" por sección
+  (function(){
+    const section = document.getElementById('sistemas');
+    if(!section) return;
+
+    const toggles = Array.from(section.querySelectorAll('input.negados-toggle'));
+    toggles.forEach(tg => {
+      const chips = tg.closest('.chips');
+      if(!chips) return;
+      const others = Array.from(chips.querySelectorAll('input[type="checkbox"]')).filter(cb => cb !== tg);
+
+      const sync = () => {
+        const on = !!tg.checked;
+        others.forEach(cb => {
+          cb.disabled = on;
+          if(on) cb.checked = false;
+        });
+      };
+
+      tg.addEventListener('change', sync);
+      sync();
+    });
+  })();
+
+  // FUM: permitir escribir (dd/mm/aaaa) y también seleccionar con calendario
+  (function(){
+    const dateEl = document.getElementById('fum');
+    const textEl = document.getElementById('fumText');
+    if(!dateEl || !textEl) return;
+
+    const pad = (n) => String(n).padStart(2,'0');
+
+    const dateToDMY = (iso) => {
+      // iso: yyyy-mm-dd
+      if(!iso) return '';
+      const [y,m,d] = iso.split('-');
+      if(!y || !m || !d) return '';
+      return `${pad(d)}/${pad(m)}/${y}`;
+    };
+
+    const dmyToISO = (dmy) => {
+      // accepts dd/mm/yyyy or dd-mm-yyyy
+      if(!dmy) return '';
+      const v = dmy.trim().replace(/-/g,'/');
+      const parts = v.split('/');
+      if(parts.length !== 3) return '';
+      const [dd,mm,yy] = parts.map(p => p.trim());
+      if(!dd || !mm || !yy) return '';
+      const d = Number(dd), m = Number(mm), y = Number(yy);
+      if(!Number.isFinite(d) || !Number.isFinite(m) || !Number.isFinite(y)) return '';
+      if(y < 1900 || y > 2100 || m < 1 || m > 12 || d < 1 || d > 31) return '';
+      const iso = `${y}-${pad(m)}-${pad(d)}`;
+      // validate by constructing Date
+      const dt = new Date(iso + 'T00:00:00');
+      if(Number.isNaN(dt.getTime())) return '';
+      // check round-trip (avoid 31/02)
+      if(dt.getUTCFullYear() !== y || (dt.getUTCMonth()+1) !== m || dt.getUTCDate() !== d) return '';
+      return iso;
+    };
+
+    const fromDate = () => { textEl.value = dateToDMY(dateEl.value); };
+    const fromText = () => {
+      const iso = dmyToISO(textEl.value);
+      if(iso) dateEl.value = iso;
+    };
+
+    dateEl.addEventListener('change', fromDate);
+    textEl.addEventListener('blur', fromText);
+    textEl.addEventListener('change', fromText);
+
+    // init
+    fromDate();
+  })();
+// Exportación sencilla a Word (HTML compatible)
   function downloadWord(){
     const main = document.querySelector('main');
     if(!main) return;
