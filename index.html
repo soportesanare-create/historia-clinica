@@ -139,6 +139,19 @@
       .wrap{padding:0 !important; max-width:none !important;}
       .card{box-shadow:none !important;}
     }
+    .hidden{display:none !important;}
+
+    /* Ajuste compacto para G / P / C-A */
+    .row-gpc{
+      display:grid;
+      grid-template-columns: 90px 90px 1fr;
+      gap:12px;
+      align-items:start;
+    }
+    @media (max-width:720px){
+      .row-gpc{grid-template-columns: 70px 70px 1fr;}
+    }
+
   </style>
 </head>
 
@@ -156,6 +169,7 @@
       <nav class="single">
         <a class="btn pdf" href="#" onclick="window.print();return false;">⬇️ Descargar PDF</a>
         <a class="btn print" href="#" onclick="window.print();return false;">🖨️ Imprimir</a>
+        <a class="btn word" href="#" onclick="downloadWord();return false;">📝 Descargar Word</a>
       </nav>
 
     </header>
@@ -441,7 +455,16 @@
         </div>
 
         <div class="field"><label>Hospitalizaciones en los últimos 6 meses</label>
-          <select><option value="">Selecciona…</option><option>Sí</option><option>No</option></select>
+          <select id="hospitalizacionesSelect">
+            <option value="">Selecciona…</option>
+            <option>Sí</option>
+            <option>No</option>
+          </select>
+        </div>
+
+        <div class="row hidden" id="hospitalizacionesDetalles">
+          <div class="field"><label>Motivo de la hospitalización</label><input id="hospitalizacionesMotivo" placeholder="Describe el motivo" /></div>
+          <div class="field"><label>Tiempo / duración</label><input id="hospitalizacionesTiempo" placeholder="Ej. 3 días / 1 semana" /></div>
         </div>
 
         <div class="divider"></div>
@@ -512,10 +535,25 @@
           </div>
         </div>
 
-        <div class="row3">
+        <div class="row-gpc">
           <div class="field"><label>G</label><input type="number" min="0" /></div>
           <div class="field"><label>P</label><input type="number" min="0" /></div>
           <div class="field"><label>C / A</label><input placeholder="Ej. C=0, A=0" /></div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>Último evento obstétrico</label>
+            <select id="ultimoEventoObstetrico">
+              <option value="">Selecciona…</option>
+              <option>Parto</option>
+              <option>Cesárea</option>
+              <option>Aborto</option>
+              <option>Embarazo actual</option>
+              <option>Ninguno</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="field"><label>¿Cuándo fue?</label><input id="ultimoEventoObstetricoFecha" type="date" /></div>
         </div>
       </section>
 
@@ -677,10 +715,120 @@
         <div class="muted">Basado en la lista de correcciones solicitadas.</div>
       </section>
 
+      <section class="card" id="firmas" style="margin-top:14px">
+        <h2>Firmas</h2>
+        <div class="divider"></div>
+        <div class="row">
+          <div class="field">
+            <label>Médico(a) tratante</label>
+            <div style="padding:12px 12px;border:1px dashed var(--line);border-radius:14px;background:rgba(176,138,131,.04)">
+              <div><b>Dra Karen Elizabeth Gómez Rodríguez</b></div>
+              <div><b>Dr. Efraín Camarín Sánchez</b></div>
+            </div>
+            <div class="muted">Agregar firmas manuscritas en impresión, si aplica.</div>
+          </div>
+          <div class="field">
+            <label>¿Quién realizó?</label>
+            <input id="quienRealizo" placeholder="Nombre y cédula / área" />
+          </div>
+        </div>
+      </section>
+
       <footer>
         © SANARÉ — Plantillas clínicas (GitHub Pages). Fondo claro · Paleta SANARÉ.
       </footer>
     </main>
   </div>
+
+<script>
+  // Mostrar/ocultar detalles de hospitalización
+  (function(){
+    const sel = document.getElementById('hospitalizacionesSelect');
+    const box = document.getElementById('hospitalizacionesDetalles');
+    if(sel && box){
+      const toggle = () => {
+        const v = (sel.value || '').trim();
+        if(v === 'Sí'){
+          box.classList.remove('hidden');
+        }else{
+          box.classList.add('hidden');
+          const m = document.getElementById('hospitalizacionesMotivo');
+          const t = document.getElementById('hospitalizacionesTiempo');
+          if(m) m.value = '';
+          if(t) t.value = '';
+        }
+      };
+      sel.addEventListener('change', toggle);
+      toggle();
+    }
+  })();
+
+  // Exportación sencilla a Word (HTML compatible)
+  function downloadWord(){
+    const main = document.querySelector('main');
+    if(!main) return;
+
+    const clone = main.cloneNode(true);
+
+    const replaceControl = (el, text) => {
+      const span = document.createElement('span');
+      span.textContent = text || '';
+      span.style.whiteSpace = 'pre-wrap';
+      span.style.display = 'block';
+      span.style.padding = '10px 12px';
+      span.style.border = '1px solid #e5e7eb';
+      span.style.borderRadius = '12px';
+      span.style.background = '#ffffff';
+      el.parentNode.replaceChild(span, el);
+    };
+
+    clone.querySelectorAll('input').forEach(inp=>{
+      if(inp.type === 'checkbox'){
+        const label = inp.closest('label');
+        const txt = (inp.checked ? '☑ ' : '☐ ') + (label ? label.textContent.replace(/\s+/g,' ').trim() : '');
+        const chip = inp.closest('.chip');
+        if(chip){
+          chip.textContent = txt;
+        }else{
+          replaceControl(inp, inp.checked ? 'Sí' : 'No');
+        }
+      }else{
+        replaceControl(inp, inp.value || '');
+      }
+    });
+
+    clone.querySelectorAll('textarea').forEach(ta=>{
+      replaceControl(ta, ta.value || '');
+    });
+
+    clone.querySelectorAll('select').forEach(sel=>{
+      const val = sel.options && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex].text : (sel.value || '');
+      replaceControl(sel, val || '');
+    });
+
+    const html =
+`<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Historia Clínica SANARÉ</title>
+</head>
+<body>
+${clone.innerHTML}
+</body>
+</html>`;
+
+    const blob = new Blob([html], {type: 'application/msword'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Historia_Clinica_SANARE.doc';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
+  }
+</script>
 </body>
 </html>
