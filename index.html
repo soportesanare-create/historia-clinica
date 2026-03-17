@@ -135,22 +135,63 @@
 
   
     @media print{
-      header, footer{display:none !important;}
-      body{background:#fff !important;}
+      @page{size: letter portrait; margin: 8mm;}
+      html, body{background:#fff !important;}
+      body{
+        font-size:11px !important;
+        line-height:1.2 !important;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+      }
+      header, footer, #indice, #checklist{display:none !important;}
       .wrap{padding:0 !important; max-width:none !important;}
-      .card{box-shadow:none !important;}
+      .card{
+        box-shadow:none !important;
+        border-color:#d9d9d9 !important;
+        padding:8px 10px !important;
+        margin-top:6px !important;
+        border-radius:10px !important;
+        break-inside:auto;
+        page-break-inside:auto;
+      }
+      h2, h3{
+        break-after:avoid-page;
+        page-break-after:avoid;
+      }
+      .field, .chip, .chips, .row, .row3, .row-gpc, .fum-wrap{
+        break-inside:avoid;
+        page-break-inside:avoid;
+      }
+      h2{font-size:14px !important; margin:0 0 6px !important;}
+      h3{font-size:11px !important; margin:8px 0 4px !important;}
+      p, label, .muted, li{font-size:10px !important; line-height:1.2 !important;}
+      .field{gap:3px !important; margin-top:5px !important;}
+      .row, .row3, .row-gpc{gap:6px !important;}
+      .chips{gap:4px !important; margin-top:4px !important;}
+      .chip{padding:4px 8px !important; font-size:10px !important;}
+      input, select, textarea, .field span{
+        font-size:10px !important;
+        padding:5px 7px !important;
+        min-height:0 !important;
+        border-radius:8px !important;
+      }
+      textarea{min-height:44px !important;}
+      .divider{margin:8px 0 !important;}
+      ul{margin:4px 0 0 16px !important; padding:0 !important;}
+      li{margin:0 0 2px !important;}
+      .print-hide-empty{display:none !important;}
     }
     .hidden{display:none !important;}
 
-    /* Ajuste compacto para G / P / C-A */
+    /* Ajuste compacto para G / P / C / A */
     .row-gpc{
       display:grid;
-      grid-template-columns: 90px 90px 1fr;
+      grid-template-columns: repeat(4, minmax(90px, 1fr));
       gap:12px;
       align-items:start;
     }
     @media (max-width:720px){
-      .row-gpc{grid-template-columns: 70px 70px 1fr;}
+      .row-gpc{grid-template-columns: repeat(2, minmax(90px, 1fr));}
     }
 
   
@@ -183,8 +224,8 @@
       </div>
       
       <nav class="single">
-        <a class="btn pdf" href="#" onclick="window.print();return false;">⬇️ Descargar PDF</a>
-        <a class="btn print" href="#" onclick="window.print();return false;">🖨️ Imprimir</a>
+        <a class="btn pdf" href="#" onclick="if(window.__preparePrintView){window.__preparePrintView();} window.print(); if(window.__cleanupPrintView){setTimeout(window.__cleanupPrintView,300);} return false;">⬇️ Descargar PDF</a>
+        <a class="btn print" href="#" onclick="if(window.__preparePrintView){window.__preparePrintView();} window.print(); if(window.__cleanupPrintView){setTimeout(window.__cleanupPrintView,300);} return false;">🖨️ Imprimir</a>
         <a class="btn word" href="#" onclick="downloadWord();return false;">📝 Descargar Word</a>
       </nav>
 
@@ -563,7 +604,8 @@
         <div class="row-gpc">
           <div class="field"><label>G</label><input type="number" min="0" /></div>
           <div class="field"><label>P</label><input type="number" min="0" /></div>
-          <div class="field"><label>C / A</label><input placeholder="Ej. C=0, A=0" /></div>
+          <div class="field"><label>C</label><input type="number" min="0" /></div>
+          <div class="field"><label>A</label><input type="number" min="0" /></div>
         </div>
 
         <div class="row">
@@ -879,12 +921,165 @@
     // init
     fromDate();
   })();
+
+  // PDF/Impresión: mostrar solo campos con información y opciones seleccionadas
+  (function(){
+    const hiddenNodes = [];
+
+    const hasValue = (el) => {
+      if(!el) return false;
+      const tag = (el.tagName || '').toLowerCase();
+      if(tag === 'select') return !!(el.value || '').trim();
+      if(tag === 'textarea') return !!(el.value || '').trim();
+      if(tag === 'input'){
+        const type = (el.type || '').toLowerCase();
+        if(type === 'checkbox' || type === 'radio') return !!el.checked;
+        return !!(el.value || '').trim();
+      }
+      return !!(el.textContent || '').trim();
+    };
+
+    const hideForPrint = (node) => {
+      if(!node || node.classList.contains('print-hide-empty')) return;
+      node.classList.add('print-hide-empty');
+      hiddenNodes.push(node);
+    };
+
+    const preparePrintView = () => {
+      cleanupPrintView();
+
+      ['indice','checklist'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) hideForPrint(el);
+      });
+
+      document.querySelectorAll('.field').forEach(field => {
+        const controls = Array.from(field.querySelectorAll('input, select, textarea'));
+        if(!controls.length) return;
+        const anyFilled = controls.some(hasValue);
+        if(!anyFilled) hideForPrint(field);
+      });
+
+      document.querySelectorAll('.chip').forEach(chip => {
+        const cb = chip.querySelector('input[type="checkbox"], input[type="radio"]');
+        if(cb && !cb.checked) hideForPrint(chip);
+      });
+
+      document.querySelectorAll('.chips').forEach(group => {
+        const visible = Array.from(group.children).some(el => !el.classList.contains('print-hide-empty'));
+        if(!visible) {
+          hideForPrint(group);
+          const title = group.previousElementSibling;
+          if(title && /^H3$/i.test(title.tagName)) hideForPrint(title);
+        }
+      });
+
+      document.querySelectorAll('.row, .row3, .row-gpc, .fum-wrap').forEach(block => {
+        const visible = Array.from(block.children).some(el => !el.classList.contains('print-hide-empty'));
+        if(!visible) hideForPrint(block);
+      });
+
+      document.querySelectorAll('.divider').forEach(div => {
+        const prevVisible = div.previousElementSibling && !div.previousElementSibling.classList.contains('print-hide-empty');
+        const nextVisible = div.nextElementSibling && !div.nextElementSibling.classList.contains('print-hide-empty');
+        if(!prevVisible || !nextVisible) hideForPrint(div);
+      });
+
+      document.querySelectorAll('section.card').forEach(section => {
+        const contentNodes = Array.from(section.children).filter(el => !/^H2$/i.test(el.tagName));
+        const hasVisibleContent = contentNodes.some(el => !el.classList.contains('print-hide-empty'));
+        if(!hasVisibleContent) {
+          hideForPrint(section);
+          return;
+        }
+        const heading = section.querySelector('h2');
+        if(heading && section.id === 'firmas') {
+          const filledInputs = Array.from(section.querySelectorAll('input, select, textarea')).some(hasValue);
+          if(!filledInputs) hideForPrint(section);
+        }
+      });
+    };
+
+    const cleanupPrintView = () => {
+      while(hiddenNodes.length){
+        const node = hiddenNodes.pop();
+        node.classList.remove('print-hide-empty');
+      }
+    };
+
+    window.addEventListener('beforeprint', preparePrintView);
+    window.addEventListener('afterprint', cleanupPrintView);
+
+    window.__preparePrintView = preparePrintView;
+    window.__cleanupPrintView = cleanupPrintView;
+  })();
+
 // Exportación sencilla a Word (HTML compatible)
   function downloadWord(){
     const main = document.querySelector('main');
     if(!main) return;
 
     const clone = main.cloneNode(true);
+
+    const hasValue = (el) => {
+      if(!el) return false;
+      const tag = (el.tagName || '').toLowerCase();
+      if(tag === 'select') return !!(el.value || '').trim();
+      if(tag === 'textarea') return !!(el.value || '').trim();
+      if(tag === 'input'){
+        const type = (el.type || '').toLowerCase();
+        if(type === 'checkbox' || type === 'radio') return !!el.checked;
+        return !!(el.value || '').trim();
+      }
+      return !!(el.textContent || '').trim();
+    };
+
+    const removeIfExists = (node) => {
+      if(node && node.parentNode) node.parentNode.removeChild(node);
+    };
+
+    ['indice','checklist'].forEach(id => removeIfExists(clone.querySelector(`#${id}`)));
+
+    clone.querySelectorAll('.field').forEach(field => {
+      const controls = Array.from(field.querySelectorAll('input, select, textarea'));
+      if(!controls.length) return;
+      if(!controls.some(hasValue)) removeIfExists(field);
+    });
+
+    clone.querySelectorAll('.chip').forEach(chip => {
+      const cb = chip.querySelector('input[type="checkbox"], input[type="radio"]');
+      if(cb && !cb.checked) removeIfExists(chip);
+    });
+
+    clone.querySelectorAll('.chips').forEach(group => {
+      if(!group.children.length) {
+        const title = group.previousElementSibling;
+        removeIfExists(group);
+        if(title && /^H3$/i.test(title.tagName)) removeIfExists(title);
+      }
+    });
+
+    clone.querySelectorAll('.row, .row3, .row-gpc, .fum-wrap').forEach(block => {
+      if(!block.children.length) return;
+      const visibleChildren = Array.from(block.children).filter(el => !!el.parentNode);
+      if(!visibleChildren.length) removeIfExists(block);
+    });
+
+    clone.querySelectorAll('.divider').forEach(div => {
+      if(!div.previousElementSibling || !div.nextElementSibling) removeIfExists(div);
+    });
+
+    clone.querySelectorAll('section.card').forEach(section => {
+      const contentNodes = Array.from(section.children).filter(el => !/^H2$/i.test(el.tagName));
+      if(!contentNodes.length) {
+        removeIfExists(section);
+        return;
+      }
+      if(section.id === 'firmas') {
+        const filledInputs = Array.from(section.querySelectorAll('input, select, textarea')).some(hasValue);
+        if(!filledInputs) removeIfExists(section);
+      }
+    });
 
     const replaceControl = (el, text) => {
       const span = document.createElement('span');
@@ -899,14 +1094,14 @@
     };
 
     clone.querySelectorAll('input').forEach(inp=>{
-      if(inp.type === 'checkbox'){
+      if(inp.type === 'checkbox' || inp.type === 'radio'){
         const label = inp.closest('label');
         const txt = (inp.checked ? '☑ ' : '☐ ') + (label ? label.textContent.replace(/\s+/g,' ').trim() : '');
         const chip = inp.closest('.chip');
         if(chip){
           chip.textContent = txt;
         }else{
-          replaceControl(inp, inp.checked ? 'Sí' : 'No');
+          replaceControl(inp, inp.checked ? 'Sí' : '');
         }
       }else{
         replaceControl(inp, inp.value || '');
@@ -918,9 +1113,51 @@
     });
 
     clone.querySelectorAll('select').forEach(sel=>{
-      const val = sel.options && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex].text : (sel.value || '');
-      replaceControl(sel, val || '');
+      const val = (sel.value || '').trim();
+      const text = val && sel.options && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex].text : val;
+      replaceControl(sel, text || '');
     });
+
+    // En Word, unir etiqueta + valor para que no se vean pegados
+    clone.querySelectorAll('.field').forEach(field => {
+      const label = field.querySelector('label');
+      const rendered = field.querySelector('span');
+      if(!label || !rendered) return;
+
+      const rawLabel = (label.textContent || '').replace(/\s+/g, ' ').trim();
+      const rawValue = (rendered.textContent || '').replace(/\s+/g, ' ').trim();
+      const value = (!rawValue || rawValue === 'Selecciona…' || rawValue === 'Selecciona...') ? '' : rawValue;
+
+      if(!value){
+        field.remove();
+        return;
+      }
+
+      field.innerHTML = `<div style="padding:4px 0; line-height:1.45;"><strong>${rawLabel}:<\/strong> ${value}<\/div>`;
+    });
+
+    clone.querySelectorAll('.actions, script').forEach(removeIfExists);
+    clone.querySelectorAll('[style]').forEach(el => el.removeAttribute('style'));
+    clone.querySelectorAll('.muted').forEach(node => {
+      if(!(node.textContent || '').trim()) removeIfExists(node);
+    });
+
+    const pruneEmptyNodes = (root) => {
+      Array.from(root.childNodes).forEach(node => {
+        if(node.nodeType === Node.TEXT_NODE && !(node.textContent || '').trim()){
+          removeIfExists(node);
+          return;
+        }
+        if(node.nodeType === Node.ELEMENT_NODE){
+          pruneEmptyNodes(node);
+          const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
+          if(!node.children.length && !text && !/^(BR|HR)$/i.test(node.tagName || '')){
+            removeIfExists(node);
+          }
+        }
+      });
+    };
+    pruneEmptyNodes(clone);
 
     const html =
 `<!doctype html>
@@ -929,6 +1166,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Historia Clínica SANARÉ</title>
+<style>
+  @page{size:auto; margin:12mm;}
+  body{font-family: Arial, sans-serif; margin:0; color:#1f2937; font-size:11pt; line-height:1.25;}
+  main, section, div{display:block;}
+  .actions, .hero, nav{display:none !important;}
+  .card{margin:0 0 10px 0; padding:10px 12px; border:1px solid #d1d5db; border-radius:10px; page-break-inside:avoid; break-inside:avoid;}
+  .row, .row3, .row-gpc, .fum-wrap{display:block; margin:0;}
+  .field{display:block; margin:0 0 8px 0;}
+  .divider{height:1px; background:#e5e7eb; margin:8px 0;}
+  h2{font-size:13pt; margin:0 0 6px 0;}
+  h3{font-size:11pt; margin:8px 0 4px 0;}
+  p, .muted, label{margin:0 0 4px 0;}
+  span{box-sizing:border-box;}
+  table{border-collapse:collapse; width:100%;}
+</style>
 </head>
 <body>
 ${clone.innerHTML}
